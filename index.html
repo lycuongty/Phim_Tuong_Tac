@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Cấu hình Referrer Policy chuẩn để tránh Lỗi 153 -->
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    
+    <title>Phim Tương Tác Điện Ảnh - YouTube Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;0,700;1,500&display=swap');
+        
+        body {
+            font-family: 'Times New Roman', Times, serif !important;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .font-serif {
+            font-family: 'Times New Roman', Times, serif !important;
+        }
+
+        /* Animations */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-up {
+            animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+
+        /* Khung viền trang trí câu hỏi */
+        .question-panel {
+            background: linear-gradient(180deg, rgba(10, 10, 10, 0.9) 0%, rgba(0, 0, 0, 0.7) 100%);
+            border-top: 2px solid rgba(234, 179, 8, 0.8);
+            border-bottom: 2px solid rgba(234, 179, 8, 0.8);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(234,179,8,0.1);
+        }
+
+        /* Nút lựa chọn */
+        .choice-btn-wrapper {
+            position: relative;
+            background: rgba(15, 15, 20, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s ease;
+        }
+
+        .ornate-corner {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            border: 2px solid #eab308;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 20;
+        }
+        
+        .corner-tl { top: -1px; left: -1px; border-right: none; border-bottom: none; border-radius: 8px 0 0 0; }
+        .corner-tr { top: -1px; right: -1px; border-left: none; border-bottom: none; border-radius: 0 8px 0 0; }
+        .corner-bl { bottom: -1px; left: -1px; border-right: none; border-top: none; border-radius: 0 0 0 8px; }
+        .corner-br { bottom: -1px; right: -1px; border-left: none; border-top: none; border-radius: 0 0 8px 0; }
+
+        .choice-btn-wrapper:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(234, 179, 8, 0.2);
+            border-color: rgba(234, 179, 8, 0.3);
+            background: rgba(20, 20, 15, 0.95);
+        }
+
+        .choice-btn-wrapper:hover .ornate-corner {
+            width: calc(100% + 2px);
+            height: calc(100% + 2px);
+            opacity: 0.5;
+            border-color: rgba(234, 179, 8, 0.8);
+        }
+
+        .text-gold-gradient {
+            background: linear-gradient(to right, #fde047, #eab308, #fde047);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .glass-panel {
+            background: rgba(15, 15, 20, 0.65);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Khung YouTube Phủ tràn màn hình toàn bộ */
+        .youtube-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .youtube-container iframe {
+            width: 100vw;
+            height: 56.25vw; /* Tỷ lệ 16:9 */
+            min-height: 100vh;
+            min-width: 177.77vh; /* Tỷ lệ 16:9 */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body class="w-screen h-screen relative select-none">
+
+    <!-- Màn hình Khởi động -->
+    <div id="start-screen" class="absolute inset-0 z-40 flex flex-col items-center justify-center bg-[url('https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=2059&auto=format&fit=crop')] bg-cover bg-center">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+        <div class="relative z-10 flex flex-col items-center text-center px-4 w-full max-w-5xl">
+            <h2 class="text-yellow-500 font-bold tracking-[0.2em] md:tracking-[0.3em] uppercase text-xs md:text-sm mb-6 animate-fade-up">Trải Nghiệm Điện Ảnh</h2>
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold font-serif text-white mb-16 drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] animate-fade-up delay-100 leading-tight">SỰ LỰA CHỌN</h1>
+            <button id="btn-start" onclick="startInteractiveMovie()" class="px-8 md:px-12 py-4 md:py-5 bg-white/10 hover:bg-white text-white hover:text-black border border-white/30 rounded-full text-base md:text-xl uppercase tracking-[0.1em] font-semibold transition-all duration-500 hover:shadow-[0_0_40px_rgba(255,255,255,0.5)] animate-fade-up delay-200 backdrop-blur-md w-3/4 md:w-auto">
+                Bắt đầu Hành Trình
+            </button>
+        </div>
+    </div>
+
+    <!-- Khung Trình Phát YouTube -->
+    <div class="youtube-container">
+        <div id="youtube-player"></div>
+    </div>
+
+    <!-- Overlay Lựa chọn -->
+    <div id="choice-overlay" class="hidden absolute inset-0 z-20 flex flex-col items-center justify-end pb-8 md:pb-16 lg:pb-24 bg-gradient-to-t from-black via-black/60 to-transparent">
+        <div class="w-full max-w-6xl px-4 md:px-8 flex flex-col items-center opacity-0 transform translate-y-12 transition-all duration-700 ease-out" id="choice-content">
+            
+            <div class="question-panel w-full max-w-4xl px-6 md:px-12 py-6 md:py-8 rounded-2xl mb-8 md:mb-12 text-center relative">
+                <h3 id="question-text" class="text-2xl md:text-4xl lg:text-5xl font-serif font-bold text-gold-gradient drop-shadow-2xl leading-snug md:leading-tight"></h3>
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-5 md:gap-10 w-full max-w-5xl justify-center">
+                <button id="btn-choice-a" class="choice-btn-wrapper flex-1 group overflow-hidden">
+                    <div class="ornate-corner corner-tl"></div>
+                    <div class="ornate-corner corner-tr"></div>
+                    <div class="ornate-corner corner-bl"></div>
+                    <div class="ornate-corner corner-br"></div>
+                    
+                    <div class="px-6 py-6 md:py-8 text-center relative z-10 flex flex-col items-center justify-center min-h-[100px] md:min-h-[140px]">
+                        <span class="text-yellow-500/50 text-xs md:text-sm font-bold uppercase tracking-widest mb-2 group-hover:text-yellow-500 transition-colors">Lựa chọn 1</span>
+                        <span id="btn-choice-a-text" class="text-xl md:text-2xl lg:text-3xl font-semibold text-white group-hover:text-yellow-400 transition-colors drop-shadow-md"></span>
+                    </div>
+                </button>
+
+                <button id="btn-choice-b" class="choice-btn-wrapper flex-1 group overflow-hidden">
+                    <div class="ornate-corner corner-tl"></div>
+                    <div class="ornate-corner corner-tr"></div>
+                    <div class="ornate-corner corner-bl"></div>
+                    <div class="ornate-corner corner-br"></div>
+                    
+                    <div class="px-6 py-6 md:py-8 text-center relative z-10 flex flex-col items-center justify-center min-h-[100px] md:min-h-[140px]">
+                        <span class="text-yellow-500/50 text-xs md:text-sm font-bold uppercase tracking-widest mb-2 group-hover:text-yellow-500 transition-colors">Lựa chọn 2</span>
+                        <span id="btn-choice-b-text" class="text-xl md:text-2xl lg:text-3xl font-semibold text-white group-hover:text-yellow-400 transition-colors drop-shadow-md"></span>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay Kết Thúc -->
+    <div id="end-overlay" class="hidden absolute inset-0 z-30 bg-black/90 backdrop-blur-lg flex flex-col items-center justify-center px-4 text-center">
+        <h2 id="end-title" class="text-5xl md:text-7xl font-serif font-bold mb-16 text-gold-gradient drop-shadow-[0_0_20px_rgba(234,179,8,0.3)]">HẾT PHIM</h2>
+        <div class="flex flex-col sm:flex-row gap-6 w-full max-w-2xl justify-center">
+            <button onclick="startReviewMode()" class="flex-1 px-8 py-5 glass-panel border border-yellow-500 text-yellow-500 rounded-xl font-bold uppercase tracking-widest md:text-lg hover:bg-yellow-500 hover:text-black transition-all duration-300">
+                <span id="btn-review">Xem lại Lịch trình</span>
+            </button>
+            <button onclick="restartMovie()" class="flex-1 px-8 py-5 glass-panel border border-white/20 text-white rounded-xl font-bold uppercase tracking-widest md:text-lg hover:bg-white hover:text-black transition-all duration-300">
+                Chơi lại từ đầu
+            </button>
+        </div>
+    </div>
+
+    <!-- Nạp Thư Viện YouTube IFrame API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <script>
+        // =========================================================================
+        // DÙNG CÁC YOUTUBE VIDEO ID CỦA BẠN (VD: dQw4w9WgXcQ)
+        // =========================================================================
+        const STORY_GRAPH = {
+            1: { id: 1, youtubeId: 'FGDmbjuSG7g', question: 'Bạn nhận được một cuộc gọi lạ lúc nửa đêm, bạn sẽ làm gì?', choiceA: 'Nghe máy ngay lập tức', choiceB: 'Bỏ qua và tiếp tục ngủ', left: 2, right: 3 },
+            2: { id: 2, youtubeId: 'YOUTUBE_ID_CLIP2', question: 'Đầu dây bên kia báo tin khẩn cấp tại căn nhà hoang. Bạn sẽ?', choiceA: 'Lái xe đến kiểm tra ngay', choiceB: 'Báo cảnh sát hỗ trợ', left: 4, right: 5 },
+            3: { id: 3, youtubeId: 'YOUTUBE_ID_CLIP3', question: 'Có tiếng gõ cửa dồn dập bên ngoài phòng ngủ. Bạn sẽ?', choiceA: 'Mở cửa ra xem', choiceB: 'Cầm vũ khí tự vệ và trốn', left: 6, right: 7 },
+            4: { id: 4, youtubeId: 'YOUTUBE_ID_CLIP4', question: 'Đã đến ngôi nhà hoang, bạn thấy bóng người vụt qua. Bạn sẽ?', choiceA: 'Đuổi theo bóng đen', choiceB: 'Rút lui ra xe', left: 8, right: 9 },
+            5: { id: 5, youtubeId: 'YOUTUBE_ID_CLIP5', question: 'Cảnh sát yêu cầu bạn ở nguyên vị trí. Bạn sẽ?', choiceA: 'Đợi cảnh sát tới', choiceB: 'Tự mình vào điều tra trước', left: 10, right: 11 },
+            6: { id: 6, youtubeId: 'YOUTUBE_ID_CLIP6', question: 'Mở cửa ra không thấy ai, chỉ có một chiếc hộp gỗ. Bạn sẽ?', choiceA: 'Mở hộp gỗ xem thử', choiceB: 'Bỏ qua và khóa cửa lại', left: 12, right: 13 },
+            7: { id: 7, youtubeId: 'YOUTUBE_ID_CLIP7', question: 'Kẻ đột nhập đã phá cửa vào phòng. Bạn sẽ?', choiceA: 'Tấn công dũng cảm', choiceB: 'Bỏ chạy ra cửa sau', left: 14, right: 15 },
+
+            8:  { id: 8,  youtubeId: 'YOUTUBE_ID_CLIP8',  isLeaf: true },
+            9:  { id: 9,  youtubeId: 'YOUTUBE_ID_CLIP9',  isLeaf: true },
+            10: { id: 10, youtubeId: 'YOUTUBE_ID_CLIP10', isLeaf: true },
+            11: { id: 11, youtubeId: 'YOUTUBE_ID_CLIP11', isLeaf: true },
+            12: { id: 12, youtubeId: 'YOUTUBE_ID_CLIP12', isLeaf: true },
+            13: { id: 13, youtubeId: 'YOUTUBE_ID_CLIP13', isLeaf: true },
+            14: { id: 14, youtubeId: 'YOUTUBE_ID_CLIP14', isLeaf: true },
+            15: { id: 15, youtubeId: 'YOUTUBE_ID_CLIP15', isLeaf: true }
+        };
+
+        let ytPlayer = null;
+        let isPlayerReady = false;
+        let pathHistory = [];
+        let currentNode = null;
+        let mode = 'interactive'; 
+        let reviewIndex = 0;
+
+        const startScreen = document.getElementById('start-screen');
+        const choiceOverlay = document.getElementById('choice-overlay');
+        const choiceContent = document.getElementById('choice-content');
+        const endOverlay = document.getElementById('end-overlay');
+
+        // Khởi tạo YouTube Player với cấu hình gỡ bỏ Lỗi 153
+        function onYouTubeIframeAPIReady() {
+            ytPlayer = new YT.Player('youtube-player', {
+                host: 'https://www.youtube-nocookie.com', // Dùng nocookie domain
+                playerVars: {
+                    'autoplay': 1,
+                    'controls': 0,        
+                    'rel': 0,             
+                    'showinfo': 0,
+                    'modestbranding': 1,  
+                    'disablekb': 1,       
+                    'fs': 0,              
+                    'playsinline': 1,
+                    'enablejsapi': 1,
+                    'origin': (window.location.origin && window.location.origin !== 'null') ? window.location.origin : 'http://localhost:5500'
+                },
+                events: {
+                    'onReady': (event) => { 
+                        isPlayerReady = true; 
+                        // Thêm thuộc tính referrerpolicy trực tiếp vào iframe được tạo ra
+                        const iframe = event.target.getIframe();
+                        if (iframe) {
+                            iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+                        }
+                    },
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function startInteractiveMovie() {
+            startScreen.classList.add('hidden');
+            endOverlay.classList.add('hidden');
+            mode = 'interactive';
+            pathHistory = [1];
+            playNode(1);
+        }
+
+        function restartMovie() {
+            choiceOverlay.classList.add('hidden');
+            choiceContent.classList.remove('opacity-100', 'translate-y-0');
+            endOverlay.classList.add('hidden');
+            if (ytPlayer && ytPlayer.stopVideo) ytPlayer.stopVideo();
+            
+            startScreen.classList.remove('hidden');
+        }
+
+        function playNode(nodeId) {
+            currentNode = nodeId;
+            const node = STORY_GRAPH[nodeId];
+            
+            choiceOverlay.classList.add('hidden');
+            choiceContent.classList.remove('opacity-100', 'translate-y-0');
+            endOverlay.classList.add('hidden');
+
+            if (ytPlayer && isPlayerReady) {
+                ytPlayer.loadVideoById(node.youtubeId);
+                ytPlayer.playVideo();
+            } else {
+                let checkReady = setInterval(() => {
+                    if (isPlayerReady && ytPlayer) {
+                        clearInterval(checkReady);
+                        ytPlayer.loadVideoById(node.youtubeId);
+                        ytPlayer.playVideo();
+                    }
+                }, 200);
+            }
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.ENDED) {
+                handleVideoEnded();
+            }
+        }
+
+        function handleVideoEnded() {
+            if (mode === 'review') {
+                reviewIndex++;
+                if (reviewIndex < pathHistory.length) {
+                    playNode(pathHistory[reviewIndex]);
+                } else {
+                    endOverlay.classList.remove('hidden');
+                    document.getElementById('end-title').innerText = 'Hết phim';
+                    document.getElementById('btn-review').innerText = 'Xem lại lần nữa';
+                }
+                return;
+            }
+
+            const node = STORY_GRAPH[currentNode];
+            if (node.isLeaf) {
+                endOverlay.classList.remove('hidden');
+                document.getElementById('end-title').innerText = 'Cái kết của bộ phim';
+                document.getElementById('btn-review').innerText = 'Xem toàn bộ';
+            } else {
+                showChoices(node);
+            }
+        }
+
+        function showChoices(node) {
+            choiceOverlay.classList.remove('hidden');
+            
+            document.getElementById('question-text').innerText = node.question;
+            document.getElementById('btn-choice-a-text').innerText = node.choiceA;
+            document.getElementById('btn-choice-b-text').innerText = node.choiceB;
+            
+            setTimeout(() => {
+                choiceContent.classList.add('opacity-100', 'translate-y-0');
+                choiceContent.classList.remove('opacity-0', 'translate-y-12');
+            }, 100);
+            
+            document.getElementById('btn-choice-a').onclick = () => makeChoice(node.left);
+            document.getElementById('btn-choice-b').onclick = () => makeChoice(node.right);
+        }
+
+        function makeChoice(nextNodeId) {
+            pathHistory.push(nextNodeId);
+            choiceContent.classList.remove('opacity-100', 'translate-y-0');
+            choiceContent.classList.add('opacity-0', 'translate-y-12');
+            
+            setTimeout(() => {
+                playNode(nextNodeId);
+            }, 400);
+        }
+
+        function startReviewMode() {
+            endOverlay.classList.add('hidden');
+            mode = 'review';
+            reviewIndex = 0;
+            if (pathHistory.length > 0) {
+                playNode(pathHistory[0]);
+            }
+        }
+    </script>
+</body>
+</html>
